@@ -12,15 +12,19 @@ type Post = {
   };
 };
 
+// טיפוס עבור הפרופס שמקבל את העמוד
+type PostPageProps = {
+  params: {
+    id: string;
+  };
+};
+
 async function getPost(id: string): Promise<Post> {
-  const res = await fetch(`https://public-api.wordpress.com/wp/v2/sites/en.blog.wordpress.com/posts/${id}`, {
-    next: { revalidate: 60 },
-  });
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch post');
-  }
-
+  const res = await fetch(
+    `https://public-api.wordpress.com/wp/v2/sites/en.blog.wordpress.com/posts/${id}`,
+    { next: { revalidate: 60 } }
+  );
+  if (!res.ok) throw new Error('Failed to fetch post');
   return res.json();
 }
 
@@ -36,15 +40,16 @@ async function getFeaturedImage(post: Post): Promise<string | null> {
 }
 
 async function getTagName(tagId: number): Promise<string | null> {
-  const res = await fetch(`https://public-api.wordpress.com/wp/v2/sites/en.blog.wordpress.com/tags/${tagId}`);
+  const res = await fetch(
+    `https://public-api.wordpress.com/wp/v2/sites/en.blog.wordpress.com/tags/${tagId}`
+  );
   if (!res.ok) return null;
+
   const tag = await res.json();
   return tag.name || null;
 }
 
-// שים לב: לא נוגעים בטיפוס של `params` כדי לא לשבור את Vercel!
-export default async function PostPage({ params }: { params: { id: string } })
-{
+export default async function PostPage({ params }: PostPageProps) {
   const post = await getPost(params.id);
   const imageUrl = await getFeaturedImage(post);
   const tagNames: string[] = [];
@@ -59,12 +64,17 @@ export default async function PostPage({ params }: { params: { id: string } })
   return (
     <main className="max-w-3xl mx-auto px-4 py-8">
       <h1 className="text-4xl font-bold mb-4">{post.title.rendered}</h1>
-      <p className="text-sm text-gray-500 mb-4">{new Date(post.date).toLocaleDateString()}</p>
+      <p className="text-sm text-gray-500 mb-4">
+        {new Date(post.date).toLocaleDateString()}
+      </p>
 
       {tagNames.length > 0 && (
         <div className="mb-6 flex flex-wrap gap-2">
           {tagNames.map((tag) => (
-            <span key={tag} className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+            <span
+              key={tag}
+              className="text-sm text-blue-600 bg-blue-100 px-2 py-1 rounded-full"
+            >
               #{tag}
             </span>
           ))}
