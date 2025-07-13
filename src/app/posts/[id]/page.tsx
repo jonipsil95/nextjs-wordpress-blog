@@ -42,11 +42,9 @@ async function getTagName(tagId: number): Promise<string | null> {
   return tag.name || null;
 }
 
-export default async function PostPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+// שים לב: לא נוגעים בטיפוס של `params` כדי לא לשבור את Vercel!
+export default async function PostPage({ params }: { params: { id: string } })
+{
   const post = await getPost(params.id);
   const imageUrl = await getFeaturedImage(post);
   const tagNames: string[] = [];
