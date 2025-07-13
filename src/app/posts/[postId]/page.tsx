@@ -25,6 +25,9 @@ export const dynamicParams = true;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default async function PostPage({ params }: any) {
+
+  await new Promise((resolve) => setTimeout(resolve, 1500));
+
   const post = await getPost(params.postId);
   const imageUrl = await getFeaturedImage(post);
   const tagNames = post.tags
