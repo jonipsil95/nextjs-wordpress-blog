@@ -13,12 +13,6 @@ type Post = {
   };
 };
 
-type PostPageProps = {
-  params: {
-    id: string;
-  };
-};
-
 async function getPost(id: string): Promise<Post> {
   const res = await fetch(`https://public-api.wordpress.com/wp/v2/sites/en.blog.wordpress.com/posts/${id}`, {
     next: { revalidate: 60 },
@@ -49,11 +43,13 @@ async function getTagName(tagId: number): Promise<string | null> {
   return tag.name || null;
 }
 
-export default async function PostPage({ params }: PostPageProps) {
+export default async function PostPage({ params }: { params: { id: string } }) {
   const post = await getPost(params.id);
   const imageUrl = await getFeaturedImage(post);
-
   const tagNames: string[] = [];
+
+  // ניתן להסיר את השורה הבאה כדי להשתמש בתגיות אמיתיות:
+  // const tagNames = ['WordPress', 'OpenSource', 'News'];
 
   if (post.tags && post.tags.length > 0) {
     for (const tagId of post.tags) {
