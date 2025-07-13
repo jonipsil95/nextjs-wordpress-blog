@@ -1,4 +1,3 @@
-import React from 'react';
 import Image from 'next/image';
 import CommentForm from '@/components/CommentForm';
 
@@ -10,6 +9,12 @@ type Post = {
   tags?: number[];
   _links?: {
     'wp:featuredmedia'?: { href: string }[];
+  };
+};
+
+type PostPageProps = {
+  params: {
+    id: string;
   };
 };
 
@@ -43,13 +48,10 @@ async function getTagName(tagId: number): Promise<string | null> {
   return tag.name || null;
 }
 
-export default async function PostPage({ params }: { params: { id: string } }) {
+export default async function PostPage({ params }: PostPageProps) {
   const post = await getPost(params.id);
   const imageUrl = await getFeaturedImage(post);
   const tagNames: string[] = [];
-
-  // ניתן להסיר את השורה הבאה כדי להשתמש בתגיות אמיתיות:
-  // const tagNames = ['WordPress', 'OpenSource', 'News'];
 
   if (post.tags && post.tags.length > 0) {
     for (const tagId of post.tags) {
